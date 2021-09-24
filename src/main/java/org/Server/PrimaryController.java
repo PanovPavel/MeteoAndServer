@@ -33,14 +33,14 @@ public class PrimaryController{
     public void switchToStartServer(ActionEvent actionEvent){
         FlagForStartAndStopServer = true;
         /*Создание сервер сокета*/
-        try {
-            server = new ServerSocket(8001);
+/*        try {
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
         new Thread(()->{
             while (FlagForStartAndStopServer) {
                 try {
+                    server = new ServerSocket(8001);
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
