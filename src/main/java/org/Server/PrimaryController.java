@@ -7,11 +7,14 @@ import java.util.HashMap;
 import java.lang.String.*;
 import java.io.IOException;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
 public class PrimaryController{
+    ServerSocket server = null;
+    Boolean FlagForStartAndStopServer;
     HashMap<String, String> cityTemp;
     @FXML
     Label informationFromServer;
@@ -27,19 +30,29 @@ public class PrimaryController{
         informationFromServer.setText(cityTemp.toString() + "\n");
     }
 
-    public void switchToStartServer(ActionEvent actionEvent) {
-            while (true) {
+    public void switchToStartServer(ActionEvent actionEvent){
+        FlagForStartAndStopServer = true;
+        /*Создание сервер сокета*/
+        try {
+            server = new ServerSocket(8001);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        new Thread(()->{
+            while (FlagForStartAndStopServer) {
                 try {
-                    System.out.println("asd");
-                    ServerSocket server = new ServerSocket(8001);
-                    /**
-                     *Создание сокета для подключения
-                     */
-                    informationFromServer.setText(informationFromServer.getText() + "\nСервер запущен");
-                    /**
-                     * Ожидание подключения
-                     */
-                    informationFromServer.setText(informationFromServer.getText() + "\nОжидание подключения");
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            informationFromServer.setText(informationFromServer.getText() + "\nСервер запущен");
+                        }
+                    });
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            informationFromServer.setText(informationFromServer.getText() + "\nСервер Ожидает подключения");
+                        }
+                    });
                     Socket socket = server.accept();
 
                     /**
@@ -58,7 +71,13 @@ public class PrimaryController{
                      * messageClient строка полученная от клиента
                      */
                     String messageClient = reader.readLine();
-                    informationFromServer.setText(informationFromServer.getText() + "Получение сообщения от клиента" + messageClient);
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            informationFromServer.setText(informationFromServer.getText() + "Получение сообщения от клиента" + messageClient);
+                        }
+                    });
+
                     if (cityTemp.get(messageClient) != null) {
                         writer.write("Температура в городе " + messageClient + " равна " + cityTemp.get(messageClient));
                         writer.newLine();
@@ -84,8 +103,16 @@ public class PrimaryController{
                     e.printStackTrace();
                 }
             }
+        }).start();
+
     }
     public void switchToStopServer(ActionEvent actionEvent) {
-
+        FlagForStartAndStopServer = false;
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                informationFromServer.setText(informationFromServer.getText() + "\n Сервер остановлен");
+            }
+        });
     }
 }
