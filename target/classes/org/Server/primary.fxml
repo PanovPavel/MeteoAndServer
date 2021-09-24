@@ -22,6 +22,6 @@
             <Insets bottom="10.0" top="10.0" />
          </VBox.margin>
       </HBox>
-      <Label fx:id="informationFromServer" prefHeight="54.0" prefWidth="456.0" text="Label" />
+      <Label fx:id="informationFromServer" prefHeight="275.0" prefWidth="405.0" text="Label" />
    </children>
 </VBox>
